@@ -90,7 +90,7 @@ class EKF:
         F = self.state_transition(raw_drive_meas)
         Q = self.predict_covariance(raw_drive_meas)
         self.robot.drive(raw_drive_meas)
-        print(self.get_state_vector()[0:3])
+        # print(self.get_state_vector()[0:3])
         
 
         # TODO: add your codes here to complete the prediction step

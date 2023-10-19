@@ -56,7 +56,9 @@ class Operate:
                         'output': False,
                         'save_inference': False,
                         'save_image': False,
-                        'navigation': False}
+                        'navigation': False,
+                        'information': False,
+                        'update_slam': False}
         self.quit = False
         self.pred_fname = ''
         self.request_recover_robot = False
@@ -122,8 +124,10 @@ class Operate:
             self.request_recover_robot = False
         elif self.ekf_on:  # and not self.debug_flag:
             self.ekf.predict(drive_meas)
-            self.ekf.add_landmarks(lms)
-            self.ekf.update(lms)
+            if self.command['update_slam']:
+                self.ekf.add_landmarks(lms)
+                self.ekf.update(lms)
+            self.command['update_slam'] = False
 
     # using computer vision to detect targets
     def detect_target(self):
@@ -201,7 +205,7 @@ class Operate:
                 print("Fruit: {}, Location: {}".format(fruit, fruit_navigation.search_list_dict[fruit]))
                 while drive_flag:
                     
-                    waypoint, drive_flag = fruit_navigation.path_planning(fruit_navigation.search_list[i])
+                    waypoint, drive_flag = fruit_navigation.path_planning(fruit_navigation.search_list[i], i)
                     if drive_flag == False: 
                         print("Arrived at Fruit: {}".format(fruit_navigation.search_list[i]))
                         time.sleep(3)
@@ -217,11 +221,17 @@ class Operate:
                     operate.take_pic()
                     drive_meas = measure.Drive(lv, -rv, dt)
                     operate.update_slam(drive_meas)
-
-
-                    
-
         self.command['navigation'] = False
+
+    def information(self):
+        if self.command['information']:
+            print("robot location:\n{}".format(self.ekf.robot.state))
+            lms, self.aruco_img = self.aruco_det.detect_marker_positions(self.img)
+            tags = [lm.tag for lm in lms]
+            positions = [lm.position[0][0] for lm in lms]
+            print("marker id:\n{}".format(tags))
+            print("markers location:\n{}".format(positions))
+        self.command['information'] = False
 
     # paint the GUI            
     def draw(self, canvas):
@@ -339,8 +349,14 @@ class Operate:
                 self.command['save_inference'] = True
              # Auto navigation 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_l: 
-                self.notification = 'Map is saved'
+                self.notification = 'auto-navigation'
                 self.command['navigation'] = True 
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_b: 
+                self.notification = 'returning information'
+                self.command['information'] = True 
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_TAB: 
+                self.notification = 'updating slam'
+                self.command['update_slam'] = True 
             # quit
             elif event.type == pygame.QUIT:
                 self.quit = True
@@ -406,6 +422,7 @@ if __name__ == "__main__":
         operate.save_image()
         operate.detect_target()
         operate.auto_navigation()
+        operate.information()
         # visualise
         operate.draw(canvas)
         pygame.display.update()

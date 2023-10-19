@@ -8,6 +8,7 @@ import json
 import argparse
 import time
 import matplotlib.pyplot as plt
+import ast
 
 # import SLAM components
 # sys.path.insert(0, "{}/slam".format(os.getcwd()))
@@ -202,7 +203,7 @@ class navigation:
     
         
     
-    def path_planning(self, fruit):
+    def path_planning(self, fruit, i):
         sx = self.get_robot_pose()[0][0]
         sy = self.get_robot_pose()[1][0]
         goal = self.search_list_dict[fruit]
@@ -232,8 +233,8 @@ class navigation:
             plt.grid(True)
             plt.axis("equal")
             
-        a_star = AStarPlanner(ox, oy, 5, self.robot_radius, self.show_animation)
-        rx, ry = a_star.planning(sx*100.0, sy*100.0, goal[0]*100.0, goal[1]*100.0, self.radius_threshold)
+        a_star = AStarPlanner(ox, oy, self.grid_size, self.robot_radius, self.show_animation)
+        rx, ry = a_star.planning(sx*100.0, sy*100.0, goal[0]*100.0, goal[1]*100.0, self.radius_threshold[i])
         
         rx = rx[::-1]
         ry = ry[::-1]
@@ -359,8 +360,9 @@ class navigation:
         self.obstacle_list = list(set(self.fruits_list)-set(self.search_list))
         self.obstacle_list_dict = self.print_target_fruits_pos(self.obstacle_list, self.fruits_list, self.fruits_true_pos)
 
-        self.driving_option, self.marker_size, self.fruit_size, self.radius_threshold, self.robot_radius, self.show_animation = input("manual or automatic drive? [M/A] ,marker threshold?, fruit_threshold?, radius_threshold? , robot_radius?, show_animation?").split(", ",6)
+        self.driving_option, self.marker_size, self.fruit_size, self.radius_threshold, self.robot_radius, self.grid_size, self.show_animation = input("manual or automatic drive? [M/A] ,marker threshold, fruit_threshold, radius_threshold, robot_radius, grid_size, show_animation: ").split(", ",7)
         self.marker_size = int(self.marker_size)
         self.fruit_size = int(self.fruit_size)
-        self.radius_threshold = int(self.radius_threshold)
+        self.radius_threshold = ast.literal_eval(self.radius_threshold)
         self.robot_radius = int(self.robot_radius)
+        self.grid_size = int(self.grid_size)

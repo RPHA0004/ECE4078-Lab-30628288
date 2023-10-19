@@ -3,7 +3,7 @@
 # ===============================================
 # Main params to modify
 # ===============================================
-input_image: map11.jpg
+input_image: map12.jpg
 output_map_name: test_output.txt
 
 # a reference map to specify the objects (how many for each type) on the map
@@ -20,15 +20,15 @@ fruits:
 
 # change this if the GUI is too big for your screen
 image_display_res:
-  x: 700
-  y: 450
+  x: 1400
+  y: 900
 
 # increase this if it is difficult to click on the objects
 max_click_radius: 25  # unit: [pixels]
 
 arena_size: # unit: [m]
-  x: 3.0
-  y: 3.0
+  x: 1.5
+  y: 1.5
 
 # ===============================================
 # less important params (recommend not to change)
