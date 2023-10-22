@@ -1,5 +1,5 @@
 potato
-tomato
+orange
 capsicum
-lemon
+lime
 garlic

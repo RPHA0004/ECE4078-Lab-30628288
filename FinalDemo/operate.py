@@ -192,35 +192,53 @@ class Operate:
         if self.command['navigation']:
             #Initialise 
             fruit_navigation = navigation(self.ekf, self.pibot)
-
             #Path Planning
             fruit_navigation.inputs()
-            fruit_navigation.map_generation(10, 150)
-            
-            i = 0 
-            fruit_navigation.search_list[i]
-            while i <= 4:
-                drive_flag = True
-                fruit = fruit_navigation.search_list[i]
-                print("Fruit: {}, Location: {}".format(fruit, fruit_navigation.search_list_dict[fruit]))
-                while drive_flag:
-                    
-                    waypoint, drive_flag = fruit_navigation.path_planning(fruit_navigation.search_list[i], i)
-                    if drive_flag == False: 
-                        print("Arrived at Fruit: {}".format(fruit_navigation.search_list[i]))
-                        time.sleep(3)
-                        i += 1
-                        break
-                    # Robot Movement
+            #Manual Navigation 
+            if fruit_navigation.driving_option == "m" or fruit_navigation.driving_option == "M":
+                manual_navigation_flag = True
+                while manual_navigation_flag:
+                    waypoint = fruit_navigation.manual_movement()
                     lv, rv, dt = fruit_navigation.rotation(waypoint)
-                    operate.take_pic()
                     drive_meas = measure.Drive(lv, -rv, dt)
                     operate.update_slam(drive_meas)
 
                     lv, rv, dt = fruit_navigation.linear_movement(waypoint)
-                    operate.take_pic()
                     drive_meas = measure.Drive(lv, -rv, dt)
                     operate.update_slam(drive_meas)
+
+                    uInput = input("Add a new waypoint? [Y/N]")
+                    if uInput == 'N' or uInput == 'n':
+                        manual_navigation_flag = False
+            else:
+            #Automatic Navigation
+                fruit_navigation.map_generation(10, 150)
+                i = 0 
+                fruit_navigation.search_list[i]
+                while i <= 4:
+                    drive_flag = True
+                    fruit = fruit_navigation.search_list[i]
+                    print("Fruit: {}, Location: {}".format(fruit, fruit_navigation.search_list_dict[fruit]))
+                    operate.take_pic()
+                    while drive_flag:
+                        waypoint, drive_flag = fruit_navigation.path_planning(fruit_navigation.search_list[i], i)
+                        if drive_flag == False: 
+                            print("Arrived at Fruit: {}".format(fruit_navigation.search_list[i]))
+                            time.sleep(3)
+                            i += 1
+                            break
+                        # Robot Movement
+                        lv, rv, dt = fruit_navigation.rotation(waypoint)
+                        if fruit_navigation.step_localisation:
+                            operate.take_pic()
+                        drive_meas = measure.Drive(lv, -rv, dt)
+                        operate.update_slam(drive_meas)
+
+                        lv, rv, dt = fruit_navigation.linear_movement(waypoint)
+                        if fruit_navigation.step_localisation:
+                            operate.take_pic()
+                        drive_meas = measure.Drive(lv, -rv, dt)
+                        operate.update_slam(drive_meas)
         self.command['navigation'] = False
 
     def information(self):
@@ -232,7 +250,7 @@ class Operate:
             print("marker id:\n{}".format(tags))
             print("markers location:\n{}".format(positions))
         self.command['information'] = False
-
+    
     # paint the GUI            
     def draw(self, canvas):
         canvas.blit(self.bg, (0, 0))

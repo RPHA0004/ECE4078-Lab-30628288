@@ -136,39 +136,24 @@ class navigation:
 
     def manual_movement(self):
         # The following is only a skeleton code for semi-auto navigation
-        while True:
-            # enter the waypoints
-            # instead of manually enter waypoints, you can give coordinates by clicking on a map, see camera_calibration.py from M2
-            x,y = 0.0,0.0
-            x = input("X coordinate of the waypoint: ")
-            try:
-                x = float(x)
-            except ValueError:
-                print("Please enter a number.")
-                continue
-            y = input("Y coordinate of the waypoint: ")
-            try:
-                y = float(y)
-            except ValueError:
-                print("Please enter a number.")
-                continue
-
-            # estimate the robot's pose
-            robot_pose = self.get_robot_pose()
-
-            # robot drives to the waypoint
-            waypoint = [x,y]
-            new_pose_angle = self.drive_to_point(waypoint,robot_pose)
-            updated_pose = np.array([x,y,new_pose_angle]).reshape((3,1))
-            
-            robot_pose = self.get_robot_pose()
-            print("Finished driving to waypoint: {}; New robot pose: {}".format(waypoint,robot_pose))
-
-            # exit
-            self.pibot.set_velocity([0, 0])
-            uInput = input("Add a new waypoint? [Y/N]")
-            if uInput == 'N' or uInput == 'n':
-                break
+        
+        # enter the waypoints
+        # instead of manually enter waypoints, you can give coordinates by clicking on a map, see camera_calibration.py from M2
+        x,y = 0.0,0.0
+        x = input("X coordinate of the waypoint: ")
+        try:
+            x = float(x)
+        except ValueError:
+            print("Please enter a number.")
+        y = input("Y coordinate of the waypoint: ")
+        try:
+            y = float(y)
+        except ValueError:
+            print("Please enter a number.")
+        # robot drives to the waypoint
+        waypoint = [x,y]
+        return waypoint
+    
 
     def rotation(self, waypoint):
         wheel_vel = 30 # tick
@@ -360,9 +345,33 @@ class navigation:
         self.obstacle_list = list(set(self.fruits_list)-set(self.search_list))
         self.obstacle_list_dict = self.print_target_fruits_pos(self.obstacle_list, self.fruits_list, self.fruits_true_pos)
 
-        self.driving_option, self.marker_size, self.fruit_size, self.radius_threshold, self.robot_radius, self.grid_size, self.show_animation = input("manual or automatic drive? [M/A] ,marker threshold, fruit_threshold, radius_threshold, robot_radius, grid_size, show_animation: ").split(", ",7)
+        
+        try:
+            self.driving_option, self.marker_size, self.fruit_size, self.radius_threshold, self.robot_radius, self.grid_size, self.show_animation, self.step_localisation = input("manual or automatic drive? [M/A] ,marker threshold, fruit_threshold, radius_threshold, robot_radius, grid_size, show_animation [y/n], step_localisation [y/n]: ").split(", ",8)
+        except ValueError:
+            print("Inputs incorrect, using default values...")
+            self.driving_option = "m"
+            self.marker_size = 5
+            self.fruit_size = 5
+            self.radius_threshold = [35, 35, 35, 35, 35]
+            self.robot_radius = 15
+            self.grid_size = 10
+            self.show_animation = False
+            self.step_localisation = False
+            return
+
+    
         self.marker_size = int(self.marker_size)
         self.fruit_size = int(self.fruit_size)
         self.radius_threshold = ast.literal_eval(self.radius_threshold)
         self.robot_radius = int(self.robot_radius)
         self.grid_size = int(self.grid_size)
+        if self.show_animation == 'y' or self.show_animation == 'Y':
+            self.show_animation = True
+        else:
+            self.show_animation = False
+        if self.step_localisation == 'y' or self.step_localisation == 'Y':
+            self.step_localisation = True
+        else:
+            self.step_localisation = False
+

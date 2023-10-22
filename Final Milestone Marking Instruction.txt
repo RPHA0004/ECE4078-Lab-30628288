@@ -23,4 +23,5 @@ run convert_map.py
 
 5. Navigation
 
-run auto_navigation.py
+press L on operate GUI
+quick command: a, 5, 3, [35,35,35,35,35], 15, 10, n, n
