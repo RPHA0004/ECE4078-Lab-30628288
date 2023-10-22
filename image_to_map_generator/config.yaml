@@ -3,7 +3,7 @@
 # ===============================================
 # Main params to modify
 # ===============================================
-input_image: map12.jpg
+input_image: map13.jpg
 output_map_name: test_output.txt
 
 # a reference map to specify the objects (how many for each type) on the map
@@ -27,8 +27,8 @@ image_display_res:
 max_click_radius: 25  # unit: [pixels]
 
 arena_size: # unit: [m]
-  x: 1.5
-  y: 1.5
+  x: 3.0
+  y: 3.0
 
 # ===============================================
 # less important params (recommend not to change)

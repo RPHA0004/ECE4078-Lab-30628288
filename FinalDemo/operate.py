@@ -127,7 +127,7 @@ class Operate:
             if self.command['update_slam']:
                 self.ekf.add_landmarks(lms)
                 self.ekf.update(lms)
-            self.command['update_slam'] = False
+                self.command['update_slam'] = False
 
     # using computer vision to detect targets
     def detect_target(self):
