@@ -224,12 +224,7 @@ class navigation:
         rx = rx[::-1]
         ry = ry[::-1]
 
-        if self.show_animation:  # pragma: no cover
-            plt.axis("equal")
-            plt.plot(rx[0:2], ry[0:2], "-r")
-            plt.pause(0.001)
-            plt.show(block = False)
-            plt.pause(0.001)
+        
 
         if len(rx) == 1:
             x_m = rx[0]/100
@@ -239,8 +234,35 @@ class navigation:
         else:
             x_m = rx[1]/100
             y_m = ry[1]/100 
+            i = 1 
+            if self.spline:
+                if len(rx) > 2:
+                    splining_loop = True 
+                else:
+                    splining_loop = False
+
+            if splining_loop:
+                while splining_loop:
+                    if i == len(rx)-1:
+                        splining_loop = False
+                    else:
+                        angle = np.arctan2(ry[1]-ry[0],rx[1]-rx[0])
+                        if np.arctan2(ry[i+1]-ry[i],rx[i+1]-rx[i]) != angle:
+                            splining_loop = False
+                        else:
+                            i += 1
+            x_m = rx[i]/100
+            y_m = ry[i]/100
+            
             waypoint = [x_m, y_m]
             drive_flag = True
+
+        if self.show_animation:  # pragma: no cover
+            plt.axis("equal")
+            plt.plot(rx[0:i+1], ry[0:i+1], "-r")
+            plt.pause(0.001)
+            plt.show(block = False)
+            plt.pause(0.001)
         return waypoint, drive_flag
 
     def map_generation(self, grid_size, boundary_size): 
@@ -347,7 +369,7 @@ class navigation:
 
         
         try:
-            self.driving_option, self.marker_size, self.fruit_size, self.radius_threshold, self.robot_radius, self.grid_size, self.show_animation, self.step_localisation = input("manual or automatic drive? [M/A] ,marker threshold, fruit_threshold, radius_threshold, robot_radius, grid_size, show_animation [y/n], step_localisation [y/n]: ").split(", ",8)
+            self.driving_option, self.marker_size, self.fruit_size, self.radius_threshold, self.robot_radius, self.grid_size, self.show_animation, self.step_localisation, self.start_localisation, self.spline = input("manual or automatic drive? [M/A] ,marker threshold, fruit_threshold, radius_threshold, robot_radius, grid_size, show_animation [y/n], step_localisation [y/n], start_localisation [y/n], spline [y/n]:").split(", ",10)
         except ValueError:
             print("Inputs incorrect, using default values...")
             self.driving_option = "m"
@@ -358,6 +380,8 @@ class navigation:
             self.grid_size = 10
             self.show_animation = False
             self.step_localisation = False
+            self.start_localisation = False
+            self.spline = False
             return
 
     
@@ -374,4 +398,13 @@ class navigation:
             self.step_localisation = True
         else:
             self.step_localisation = False
+        if self.start_localisation == 'y' or self.start_localisation == 'Y':
+            self.start_localisation = True
+        else:
+            self.start_localisation = False
+        if self.spline == 'y' or self.spline == 'Y':
+            self.spline = True
+        else:
+            self.spline = False
+
 

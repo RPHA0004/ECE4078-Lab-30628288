@@ -58,7 +58,9 @@ class Operate:
                         'save_image': False,
                         'navigation': False,
                         'information': False,
-                        'update_slam': False}
+                        'update_slam': False,
+                        'tog_slam': True,
+                        'auto_slam': False}
         self.quit = False
         self.pred_fname = ''
         self.request_recover_robot = False
@@ -124,10 +126,15 @@ class Operate:
             self.request_recover_robot = False
         elif self.ekf_on:  # and not self.debug_flag:
             self.ekf.predict(drive_meas)
-            if self.command['update_slam']:
+            if self.command['tog_slam']:
+                if self.command['update_slam']:
+                    self.ekf.add_landmarks(lms)
+                    self.ekf.update(lms)
+                    self.command['update_slam'] = False
+            elif self.command['auto_slam']:
                 self.ekf.add_landmarks(lms)
                 self.ekf.update(lms)
-                self.command['update_slam'] = False
+            
 
     # using computer vision to detect targets
     def detect_target(self):
@@ -219,7 +226,10 @@ class Operate:
                     drive_flag = True
                     fruit = fruit_navigation.search_list[i]
                     print("Fruit: {}, Location: {}".format(fruit, fruit_navigation.search_list_dict[fruit]))
-                    operate.take_pic()
+                    if fruit_navigation.start_localisation:
+                        operate.take_pic()
+                        drive_meas = measure.Drive(0, 0, 0.001)
+                        operate.update_slam(drive_meas)
                     while drive_flag:
                         waypoint, drive_flag = fruit_navigation.path_planning(fruit_navigation.search_list[i], i)
                         if drive_flag == False: 
@@ -373,8 +383,18 @@ class Operate:
                 self.notification = 'returning information'
                 self.command['information'] = True 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_TAB: 
-                self.notification = 'updating slam'
+                if self.command['auto_slam'] == False:
+                    self.notification = 'updating slam'
                 self.command['update_slam'] = True 
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_1: 
+                self.notification = 'Toggle Slam Mode'
+                self.command['auto_slam'] = False 
+                self.command['tog_slam'] = True 
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_2: 
+                self.notification = 'Auto Slam Mode'
+                self.command['update_slam'] = True 
+                self.command['auto_slam'] = True 
+                self.command['tog_slam'] = False 
             # quit
             elif event.type == pygame.QUIT:
                 self.quit = True
