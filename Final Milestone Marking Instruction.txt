@@ -24,4 +24,26 @@ run convert_map.py
 5. Navigation
 
 press L on operate GUI
-quick command: a, 5, 3, [35,35,35,35,35], 15, 10, n, n
+
+quick command :
+a, 5, 3, [35,35,35,35,35], 15, 10, n, n, n, n
+
+quick command(spline): 
+a, 5, 3, [35,35,35,35,35], 15, 10, n, n, n, y
+
+quick command(map, spline): 
+a, 5, 3, [35,35,35,35,35], 15, 5, y, n, n, y
+
+quick command(map, step_localiation, spline): 
+a, 5, 3, [35,35,35,35,35], 15, 5, y, y, n, y
+
+quick command(map, step_localiation, start_localisation, spline): 
+a, 5, 3, [35,35,35,35,35], 15, 5, y, y, y, y
+
+6. Rename Map 
+
+run rename_file.py
+
+7. Zip Group405_final
+
+Remember to rename to Final_maps_405.zip
