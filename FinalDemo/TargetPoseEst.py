@@ -190,7 +190,10 @@ def merge_estimations(target_pose_dict, method, fruit_count, eps, min_samples, p
         dataset = np.array(fruit_split_dict[i])
         if method == 1: #Kmeans clustering
             print("K-means clustering")
-            cluster_centre = k_means_clustering(dataset, fruit_count[i], plot)
+            if fruit_count[i] == 0:
+                continue
+            else:
+                cluster_centre = k_means_clustering(dataset, fruit_count[i], plot)
 
         elif method == 2: #DBSCAN clustering
             print("DBSCAN clustering")

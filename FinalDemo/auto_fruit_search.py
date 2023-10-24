@@ -154,7 +154,6 @@ class navigation:
         waypoint = [x,y]
         return waypoint
     
-
     def rotation(self, waypoint):
         wheel_vel = 30 # tick
         time_revolution = np.pi*self.baseline/(wheel_vel*self.scale)
